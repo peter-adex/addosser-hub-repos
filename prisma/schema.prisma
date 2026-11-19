@@ -1,0 +1,2696 @@
+<<<<<<< HEAD
+=======
+// ============================================================
+// ADDOSSER ENTERPRISE HUB — PRISMA SCHEMA
+// Stack: Next.js 14, TypeScript, MySQL, Prisma
+// ============================================================
+
+>>>>>>> d14ff358a570a0ae2263d9c3d072128e2da8652f
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+<<<<<<< HEAD
+model User {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  name         String
+  pendingName            String?
+  pendingNameRequestedAt DateTime?
+  passwordHash String?
+  avatar               String?
+  avatarStorageProvider String?
+  avatarStorageKey      String?
+  phone        String?
+  jobTitle     String?
+  department   String?
+  isActive     Boolean   @default(true)
+  invitedAt    DateTime?
+  invitedBy    String?
+  lastLoginAt  DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  role     Role   @relation(fields: [roleId], references: [id])
+  roleId   String
+  entity   Entity @relation(fields: [entityId], references: [id])
+  entityId String
+
+  approvalLimit Decimal? @db.Decimal(18, 2)
+
+  approvalActive     Boolean @default(false)
+  avatarPublicId     String?
+  mustChangePassword Boolean @default(false)
+
+  twoFactorEnabled       Boolean   @default(false)
+  twoFactorSecret        String?   @db.Text
+  twoFactorEnrolledAt    DateTime?
+  twoFactorVerifiedAt    DateTime?
+  twoFactorResetAt       DateTime?
+  twoFactorResetById     String?
+  twoFactorFailedAttempts Int      @default(0)
+  twoFactorLockedUntil    DateTime?
+  twoFactorLastUsedStep   Int?
+
+  recoveryCodes          TwoFactorRecoveryCode[]
+  resetTwoFactorForUsers User[] @relation("TwoFactorResetByAdmin")
+  twoFactorResetByAdmin  User?  @relation("TwoFactorResetByAdmin", fields: [twoFactorResetById], references: [id])
+
+  sessions              Session[]
+  invitations           Invitation[]           @relation("InvitedByUser")
+  auditLogs             AuditLog[]
+  budgetApprovals       BudgetApproval[]
+  createdBudgets        Budget[]               @relation("BudgetCreator")
+  submittedInvoices     Invoice[]              @relation("InvoiceSubmitter")
+  approvedInvoices      Invoice[]              @relation("InvoiceApprover")
+  assignedAssets        Asset[]                @relation("AssetAssignee")
+  createdAssets         Asset[]                @relation("AssetCreator")
+  notifications         Notification[]
+  passwordResetTokens   PasswordResetToken[]
+  entityAccess          UserEntity[]
+  approvalStepsActioned ApprovalInstanceStep[]
+  approvalStepsAssigned ApprovalInstanceStep[] @relation("ApprovalInstanceStepAssignee")
+  approvalWorkflowStepAssignments ApprovalWorkflowStep[] @relation("ApprovalWorkflowStepUser")
+  invoiceApprovalSelections       InvoiceApprovalSelection[] @relation("InvoiceApprovalSelectionUser")
+  createdVendors        Vendor[]               @relation("VendorCreator")
+
+  requestedAssetMovements AssetMovement[] @relation("AssetMovementRequestedBy")
+  requestedAssetSplits    AssetSplit[]    @relation("AssetSplitRequestedBy")
+  requestedAssetDisposals AssetDisposal[] @relation("AssetDisposalRequestedBy")
+
+  uploadedAssetImports   AssetImport[]   @relation("AssetImportUploader")
+  uploadedVehicleImports VehicleImport[] @relation("VehicleImportUploader")
+  uploadedBudgetImports  BudgetImport[]  @relation("BudgetImportUploader")
+  uploadedGLAccountImports GLAccountImport[] @relation("GLAccountImportUploader")
+
+  createdGLTransactions  GLTransaction[] @relation("GLTransactionCreatedBy")
+  approvedGLTransactions GLTransaction[] @relation("GLTransactionApprovedBy")
+  createdGLJournalEntries  GLJournalEntry[] @relation("GLJournalEntryCreatedBy")
+  approvedGLJournalEntries GLJournalEntry[] @relation("GLJournalEntryApprovedBy")
+
+  driver                       Driver?
+  vehicleDocuments             VehicleDocument[]        @relation("VehicleDocumentUploader")
+  createdReminders             Reminder[]               @relation("ReminderCreator")
+  acknowledgedReminders        Reminder[]               @relation("ReminderAcknowledger")
+  createdFleetWorkOrders       FleetWorkOrder[]         @relation("WOCreatedBy")
+  approvedFleetWorkOrders      FleetWorkOrder[]         @relation("WOApprover")
+  uploadedWorkOrderAttachments WorkOrderAttachment[]
+  supervisedAppraisals         DriverAppraisal[]        @relation("AppraisalSupervisor")
+  reviewedAppraisals           DriverAppraisal[]        @relation("AppraisalHRReviewer")
+  notificationPreferences      NotificationPreference[]
+  loginSessions                UserSession[]
+  createdSubscriptions         Subscription[]           @relation("SubscriptionCreator")
+  createdAnnouncements         Announcement[]           @relation("AnnouncementCreator")
+
+  paymentsAssigned  PaymentBatch[]    @relation("PaymentAssignedBy")
+  paymentsAsTeller  PaymentBatch[]    @relation("PaymentTeller")
+  paymentsProcessed PaymentTranche[]  @relation("PaymentProcessedBy")
+  paymentApprovals  PaymentApproval[] @relation("PaymentApprover")
+
+  paymentEscalationsRaised   PaymentEscalation[]   @relation("EscalationRaisedBy")
+  paymentEscalationsResolved PaymentEscalation[]   @relation("EscalationResolvedBy")
+  paymentReminders           PaymentReminder[]     @relation("ReminderCreatedBy")
+  paymentJournalEntries      PaymentJournalEntry[] @relation("JournalEntryCreatedBy")
+  paymentProofUploads        PaymentProof[]        @relation("ProofUploadedBy")
+=======
+// ======================== AUTH & USERS ========================
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  name          String
+  passwordHash  String?
+  avatar        String?
+  isActive      Boolean   @default(true)
+  invitedAt     DateTime?
+  invitedBy     String?
+  lastLoginAt   DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  role          Role      @relation(fields: [roleId], references: [id])
+  roleId        String
+  entity        Entity    @relation(fields: [entityId], references: [id])
+  entityId      String
+
+  sessions        Session[]
+  invitations     Invitation[]     @relation("InvitedByUser")
+  auditLogs       AuditLog[]
+  budgetApprovals BudgetApproval[]
+  createdBudgets  Budget[]         @relation("BudgetCreator")
+  invoices        Invoice[]
+  assignedAssets  Asset[]
+  fleetLogs       FleetLog[]
+>>>>>>> d14ff358a570a0ae2263d9c3d072128e2da8652f
+
+  @@map("users")
+}
+
+<<<<<<< HEAD
+model TwoFactorRecoveryCode {
+  id        String    @id @default(cuid())
+  userId    String
+  codeHash  String
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("two_factor_recovery_codes")
+}
+
+model SecuritySetting {
+  key         String   @id
+  value       String
+  updatedAt   DateTime @updatedAt
+  updatedById String?
+
+  @@map("security_settings")
+}
+
+model UserEntity {
+  id        String   @id @default(cuid())
+  userId    String
+  entityId  String
+  createdAt DateTime @default(now())
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  entity Entity @relation(fields: [entityId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, entityId])
+  @@map("user_entities")
+}
+
+=======
+>>>>>>> d14ff358a570a0ae2263d9c3d072128e2da8652f
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model Invitation {
+<<<<<<< HEAD
+  id             String    @id @default(cuid())
+  email          String
+  name           String    @default("")
+  token          String    @unique @default(cuid())
+  roleId         String
+  entityId       String
+  extraEntityIds String?   @db.Text
+  approvalLimit  Decimal?  @db.Decimal(18, 2)
+  invitedById    String
+  expiresAt      DateTime
+  acceptedAt     DateTime?
+  createdAt      DateTime  @default(now())
+
+  invitedBy User @relation("InvitedByUser", fields: [invitedById], references: [id])
+
+  role   Role   @relation(fields: [roleId], references: [id])
+  entity Entity @relation(fields: [entityId], references: [id])
+
+  @@map("invitations")
+}
+
+model PasswordResetToken {
+  id        String    @id @default(cuid())
+  userId    String
+  token     String    @unique @default(cuid())
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("password_reset_tokens")
+}
+
+model Role {
+  id                 String  @id @default(cuid())
+  name               String  @unique
+  description        String?
+  isSystem           Boolean @default(false)
+  sortOrder          Int     @default(0)
+  defaultLandingPath String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  users                 User[]
+  permissions           RolePermission[]
+  approvalWorkflowSteps ApprovalWorkflowStep[]
+  invitations           Invitation[]
+
+  pagePermissions RolePagePermission[]
+=======
+  id          String    @id @default(cuid())
+  email       String
+  token       String    @unique @default(cuid())
+  roleId      String
+  entityId    String
+  invitedById String
+  expiresAt   DateTime
+  acceptedAt  DateTime?
+  createdAt   DateTime  @default(now())
+
+  invitedBy User @relation("InvitedByUser", fields: [invitedById], references: [id])
+
+  @@map("invitations")
+}
+
+// ======================== ROLES & PERMISSIONS ========================
+
+model Role {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?
+  isSystem    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  users       User[]
+  permissions RolePermission[]
+>>>>>>> d14ff358a570a0ae2263d9c3d072128e2da8652f
+
+  @@map("roles")
+}
+
+model App {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  name        String
+  description String?
+  icon        String?
+  isActive    Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+
+  permissions RolePermission[]
+
+  @@map("apps")
+}
+
+model RolePermission {
+  id         String   @id @default(cuid())
+  roleId     String
+  appId      String
+  canView    Boolean  @default(false)
+  canCreate  Boolean  @default(false)
+  canEdit    Boolean  @default(false)
+  canDelete  Boolean  @default(false)
+  canApprove Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  role Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  app  App  @relation(fields: [appId], references: [id], onDelete: Cascade)
+
+  @@unique([roleId, appId])
+  @@map("role_permissions")
+}
+
+<<<<<<< HEAD
+model PermModule {
+  id        String  @id @default(cuid())
+  key       String  @unique
+  label     String
+  icon      String?
+  section   String?
+  href      String?
+  sortOrder Int     @default(0)
+  isActive  Boolean @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  pages PermPage[]
+
+  @@map("perm_modules")
+}
+
+model PermPage {
+  id        String  @id @default(cuid())
+  moduleId  String
+  key       String
+  label     String
+  icon      String?
+  href      String
+  showInNav Boolean @default(true)
+  sortOrder Int     @default(0)
+  isActive  Boolean @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  module  PermModule           @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  actions PermAction[]
+  grants  RolePagePermission[]
+
+  @@unique([moduleId, key])
+  @@map("perm_pages")
+}
+
+model PermAction {
+  id        String  @id @default(cuid())
+  pageId    String
+  key       String
+  label     String
+  sortOrder Int     @default(0)
+
+  page   PermPage             @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  grants RolePagePermission[]
+
+  @@unique([pageId, key])
+  @@map("perm_actions")
+}
+
+model RolePagePermission {
+  id        String  @id @default(cuid())
+  roleId    String
+  pageId    String
+  actionId  String
+  granted   Boolean @default(true)
+  createdAt DateTime @default(now())
+
+  role   Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  page   PermPage   @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  action PermAction @relation(fields: [actionId], references: [id], onDelete: Cascade)
+
+  @@unique([roleId, pageId, actionId])
+  @@index([roleId])
+  @@map("role_page_permissions")
+}
+=======
+// ======================== ENTITIES ========================
+>>>>>>> d14ff358a570a0ae2263d9c3d072128e2da8652f
+
+model Entity {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  code      String   @unique
+  type      String
+  address   String?
+  phone     String?
+  email     String?
+  logo      String?
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+<<<<<<< HEAD
+  shortName                  String?
+  annualMaintenanceBudgetNgn Float?  @default(0)
+  status                     String?
+  city                       String?
+  state                      String?
+  description                String? @db.Text
+
+  users             User[]
+  glAccounts        EntityGLAccount[]
+  assets            Asset[]
+  facilities        Facility[]
+  vehicles          Vehicle[]
+  invoices          Invoice[]          @relation("InvoiceEntity")
+  budgetInvoices    Invoice[]          @relation("InvoiceBudgetEntity")
+  userAccess        UserEntity[]
+  branches          Branch[]
+  approvalInstances ApprovalInstance[]
+  approvalWorkflows ApprovalWorkflow[]
+  vendors           Vendor[]
+
+  assetMovementsFrom AssetMovement[] @relation("AssetMovementFromEntity")
+  assetMovementsTo   AssetMovement[] @relation("AssetMovementToEntity")
+  invitations        Invitation[]
+
+  assetImports   AssetImport[]
+  vehicleImports VehicleImport[]
+  budgetImports  BudgetImport[]
+  glAccountImports GLAccountImport[]
+
+  glTransactions GLTransaction[]
+
+  locations EntityLocation[]
+  drivers   Driver[]
+
+  paymentBatches PaymentBatch[]
+
+  paymentJournalEntries PaymentJournalEntry[]
+  vendorLedgerEntries   VendorLedger[]
+  paymentReminders      PaymentReminder[]
+=======
+  users         User[]
+  budgets       Budget[]
+  glAccounts    EntityGLAccount[]
+  assets        Asset[]
+  facilities    Facility[]
+  vehicles      Vehicle[]
+  invoices      Invoice[]
+>>>>>>> d14ff358a570a0ae2263d9c3d072128e2da8652f
+
+  @@map("entities")
+}
+
+<<<<<<< HEAD
+model Branch {
+  id        String   @id @default(cuid())
+  entityId  String
+  name      String
+  code      String?
+  address   String?
+  phone     String?
+  manager   String?
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  entity  Entity   @relation(fields: [entityId], references: [id], onDelete: Cascade)
+  budgets Budget[]
+  assets  Asset[]
+
+  @@unique([entityId, name])
+  @@map("branches")
+}
+
+model GLAccount {
+  id          String    @id @default(cuid())
+  code        String    @unique
+  name        String
+  category    String
+  description String?
+  isActive    Boolean   @default(true)
+  invoices    Invoice[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  entityAccounts EntityGLAccount[]
+
+  glTransactions GLTransaction[]
+
+=======
+// ======================== BUDGETING ========================
+
+model GLAccount {
+  id          String   @id @default(cuid())
+  code        String   @unique
+  name        String
+  category    String
+  description String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  entityAccounts EntityGLAccount[]
+
+>>>>>>> d14ff358a570a0ae2263d9c3d072128e2da8652f
+  @@map("gl_accounts")
+}
+
+model EntityGLAccount {
+  id          String   @id @default(cuid())
+  entityId    String
+  glAccountId String
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+
+  entity    Entity    @relation(fields: [entityId], references: [id])
+  glAccount GLAccount @relation(fields: [glAccountId], references: [id])
+  budgets   Budget[]
+
+  @@unique([entityId, glAccountId])
+  @@map("entity_gl_accounts")
+}
+
+model Budget {
+  id               String           @id @default(cuid())
+  entityGLId       String
+<<<<<<< HEAD
+  branchId         String?
+  financialYear    Int
+  annualAmount     Decimal          @db.Decimal(18, 2)
+  quantity         Int?
+  distributionType DistributionType @default(EQUAL)
+  budgetType       BudgetType       @default(OPEX)
+=======
+  financialYear    Int
+  annualAmount     Decimal          @db.Decimal(18, 2)
+  distributionType DistributionType @default(EQUAL)
+>>>>>>> d14ff358a570a0ae2263d9c3d072128e2da8652f
+  status           BudgetStatus     @default(DRAFT)
+  approvedAt       DateTime?
+  notes            String?          @db.Text
+  createdById      String
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+
+  entityGL     EntityGLAccount  @relation(fields: [entityGLId], references: [id])
+<<<<<<< HEAD
+  branch       Branch?          @relation(fields: [branchId], references: [id])
+=======
+>>>>>>> d14ff358a570a0ae2263d9c3d072128e2da8652f
+  createdBy    User             @relation("BudgetCreator", fields: [createdById], references: [id])
+  monthlyLines BudgetLine[]
+  approvals    BudgetApproval[]
+  actualLines  ActualLine[]
+
+<<<<<<< HEAD
+  @@unique([entityGLId, financialYear, budgetType, branchId])
+=======
+  @@unique([entityGLId, financialYear])
+>>>>>>> d14ff358a570a0ae2263d9c3d072128e2da8652f
+  @@map("budgets")
+}
+
+model BudgetLine {
+  id        String   @id @default(cuid())
+  budgetId  String
+  month     Int
+  amount    Decimal  @db.Decimal(18, 2)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  budget Budget @relation(fields: [budgetId], references: [id], onDelete: Cascade)
+
+  @@unique([budgetId, month])
+  @@map("budget_lines")
+}
+
+model ActualLine {
+  id          String   @id @default(cuid())
+  budgetId    String
+  month       Int
+  amount      Decimal  @db.Decimal(18, 2)
+  description String?
+  referenceNo String?
+  recordedAt  DateTime @default(now())
+  createdAt   DateTime @default(now())
+
+<<<<<<< HEAD
+  invoiceId String? @unique
+
+  budget  Budget   @relation(fields: [budgetId], references: [id])
+  invoice Invoice? @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+
+  glTransaction GLTransaction?
+
+  @@index([budgetId, month])
+  @@map("actual_lines")
+}
+
+enum GLEntryType {
+  DEBIT
+  CREDIT
+}
+
+enum GLEntryStatus {
+  DRAFT
+  PENDING_APPROVAL
+  APPROVED
+  REJECTED
+  POSTED
+  CANCELLED
+}
+
+model GLTransaction {
+  id              String   @id @default(cuid())
+  entityId        String
+  glAccountId     String
+  entryType       GLEntryType
+  amount          Decimal       @db.Decimal(18, 2)
+  transactionDate DateTime
+  description     String?       @db.Text
+  referenceNo     String?
+  attachmentUrl   String?
+
+  sourceType String
+  sourceId   String?
+  invoiceId  String? @unique
+
+  assetId String?
+
+  journalEntryId String?
+
+  status             GLEntryStatus @default(DRAFT)
+  createdById        String
+  approvedById       String?
+  postedAt           DateTime?
+  approvalInstanceId String?       @unique
+
+  linkedActualLineId String? @unique
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  entity           Entity          @relation(fields: [entityId], references: [id])
+  glAccount        GLAccount       @relation(fields: [glAccountId], references: [id])
+  invoice          Invoice?        @relation(fields: [invoiceId], references: [id], onDelete: SetNull)
+  asset            Asset?          @relation(fields: [assetId], references: [id], onDelete: SetNull)
+  journalEntry     GLJournalEntry? @relation(fields: [journalEntryId], references: [id], onDelete: SetNull)
+  createdBy        User            @relation("GLTransactionCreatedBy", fields: [createdById], references: [id])
+  approvedBy       User?           @relation("GLTransactionApprovedBy", fields: [approvedById], references: [id])
+  linkedActualLine ActualLine?     @relation(fields: [linkedActualLineId], references: [id])
+
+  @@index([entityId, glAccountId])
+  @@index([status])
+  @@index([entityId, glAccountId, status])
+  @@index([assetId])
+  @@index([journalEntryId])
+  @@map("gl_transactions")
+}
+
+
+model GLJournalEntry {
+  id              String   @id @default(cuid())
+  description     String   @db.Text
+  referenceNo     String?
+  transactionDate DateTime
+  status          GLEntryStatus @default(DRAFT)
+  createdById     String
+  approvedById    String?
+  postedAt        DateTime?
+  approvalInstanceId String? @unique
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  lines      GLTransaction[]
+  createdBy  User            @relation("GLJournalEntryCreatedBy", fields: [createdById], references: [id])
+  approvedBy User?           @relation("GLJournalEntryApprovedBy", fields: [approvedById], references: [id])
+
+  @@map("gl_journal_entries")
+}
+
+=======
+  budget Budget @relation(fields: [budgetId], references: [id])
+
+  @@map("actual_lines")
+}
+
+>>>>>>> d14ff358a570a0ae2263d9c3d072128e2da8652f
+model BudgetApproval {
+  id           String         @id @default(cuid())
+  budgetId     String
+  approvedById String
+  action       ApprovalAction
+  comment      String?
+  createdAt    DateTime       @default(now())
+
+  budget     Budget @relation(fields: [budgetId], references: [id])
+  approvedBy User   @relation(fields: [approvedById], references: [id])
+
+  @@map("budget_approvals")
+}
+
+<<<<<<< HEAD
+model ApprovalWorkflow {
+  id            String   @id @default(cuid())
+  name          String   @unique
+  module        String
+  action        String
+  description   String?
+  isActive      Boolean  @default(true)
+  isExceptional Boolean  @default(false)
+  entityId      String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  entity    Entity?                @relation(fields: [entityId], references: [id])
+  steps     ApprovalWorkflowStep[]
+  instances ApprovalInstance[]
+
+  @@index([entityId, module])
+  @@map("approval_workflows")
+}
+
+model ApprovalWorkflowStep {
+  id          String   @id @default(cuid())
+  workflowId  String
+  roleId      String?
+  roleName    String   @default("")
+  userId      String?
+  stepNumber  Int
+  label       String?
+  isMandatory Boolean  @default(true)
+  approvalLimitAmount Decimal? @db.Decimal(18, 2)
+  isExceptionalApprover Boolean @default(false)
+  createdAt             DateTime @default(now())
+
+  workflow ApprovalWorkflow @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+  role     Role?            @relation(fields: [roleId], references: [id])
+  user     User?            @relation("ApprovalWorkflowStepUser", fields: [userId], references: [id])
+
+  @@unique([workflowId, stepNumber, userId])
+  @@map("approval_workflow_steps")
+}
+
+model ApprovalInstance {
+  id            String                 @id @default(cuid())
+  workflowId    String
+  entityId      String
+  resourceId    String
+  resourceType  String
+  requestedById String
+  currentStep   Int                    @default(1)
+  totalSteps    Int
+  status        ApprovalInstanceStatus @default(IN_PROGRESS)
+  completedAt   DateTime?
+  createdAt     DateTime               @default(now())
+  updatedAt     DateTime               @updatedAt
+  module        String
+
+  workflow ApprovalWorkflow       @relation(fields: [workflowId], references: [id])
+  entity   Entity                 @relation(fields: [entityId], references: [id])
+  steps    ApprovalInstanceStep[]
+
+  @@index([resourceId, resourceType])
+  @@map("approval_instances")
+}
+
+model ApprovalInstanceStep {
+  id           String             @id @default(cuid())
+  instanceId   String
+  stepNumber   Int
+  roleId       String?
+  roleName     String             @default("")
+  userId                String?
+  userName              String   @default("")
+  approvalLimitAmount   Decimal? @db.Decimal(18, 2)
+  isExceptionalApprover Boolean  @default(false)
+  status       ApprovalStepStatus @default(PENDING)
+  approvedById String?
+  comment      String?            @db.Text
+  actionedAt   DateTime?
+  notifiedAt   DateTime?
+  createdAt    DateTime           @default(now())
+
+  instance     ApprovalInstance @relation(fields: [instanceId], references: [id], onDelete: Cascade)
+  actionedBy   User?            @relation(fields: [approvedById], references: [id])
+  assignedUser User?            @relation("ApprovalInstanceStepAssignee", fields: [userId], references: [id])
+
+  @@unique([instanceId, stepNumber])
+  @@map("approval_instance_steps")
+}
+
+model InvoiceApprovalSelection {
+  id                    String   @id @default(cuid())
+  invoiceId             String
+  stepNumber            Int
+  userId                String
+  approvalLimitAmount   Decimal? @db.Decimal(18, 2)
+  isExceptionalApprover Boolean  @default(false)
+  createdAt             DateTime @default(now())
+
+  invoice Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  user    User    @relation("InvoiceApprovalSelectionUser", fields: [userId], references: [id])
+
+  @@unique([invoiceId, stepNumber])
+  @@map("invoice_approval_selections")
+}
+
+enum ImportStatus {
+  UPLOADED
+  VALIDATED
+  CONFIRMED
+  FAILED
+}
+
+enum ImportRowStatus {
+  PENDING
+  VALID
+  INVALID
+  IMPORTED
+  UPDATED
+  SKIPPED_DUPLICATE
+}
+
+model AssetImport {
+  id           String       @id @default(cuid())
+  entityId     String?
+  fileName     String
+  totalRows    Int          @default(0)
+  validRows    Int          @default(0)
+  invalidRows  Int          @default(0)
+  importedRows Int          @default(0)
+  skippedRows  Int          @default(0)
+  status       ImportStatus @default(UPLOADED)
+  uploadedById String
+  createdAt    DateTime     @default(now())
+  confirmedAt  DateTime?
+
+  entity     Entity?          @relation(fields: [entityId], references: [id])
+  uploadedBy User             @relation("AssetImportUploader", fields: [uploadedById], references: [id])
+  rows       AssetImportRow[]
+
+  @@map("asset_imports")
+}
+
+model AssetImportRow {
+  id          String          @id @default(cuid())
+  importId    String
+  rowNumber   Int
+  rawData     String          @db.Text
+  status      ImportRowStatus @default(PENDING)
+  errors      String?         @db.Text
+  createdAssetId String?
+
+  import AssetImport @relation(fields: [importId], references: [id], onDelete: Cascade)
+
+  @@index([importId, status])
+  @@map("asset_import_rows")
+}
+
+model VehicleImport {
+  id           String       @id @default(cuid())
+  entityId     String?
+  fileName     String
+  totalRows    Int          @default(0)
+  validRows    Int          @default(0)
+  invalidRows  Int          @default(0)
+  importedRows Int          @default(0)
+  skippedRows  Int          @default(0)
+  status       ImportStatus @default(UPLOADED)
+  uploadedById String
+  createdAt    DateTime     @default(now())
+  confirmedAt  DateTime?
+
+  entity     Entity?            @relation(fields: [entityId], references: [id])
+  uploadedBy User               @relation("VehicleImportUploader", fields: [uploadedById], references: [id])
+  rows       VehicleImportRow[]
+
+  @@map("vehicle_imports")
+}
+
+model VehicleImportRow {
+  id          String          @id @default(cuid())
+  importId    String
+  rowNumber   Int
+  rawData     String          @db.Text
+  status      ImportRowStatus @default(PENDING)
+  errors      String?         @db.Text
+  createdVehicleId String?
+
+  import VehicleImport @relation(fields: [importId], references: [id], onDelete: Cascade)
+
+  @@index([importId, status])
+  @@map("vehicle_import_rows")
+}
+
+model BudgetImport {
+  id           String       @id @default(cuid())
+  entityId     String?
+  fileName     String
+  totalRows    Int          @default(0)
+  validRows    Int          @default(0)
+  invalidRows  Int          @default(0)
+  importedRows Int          @default(0)
+  skippedRows  Int          @default(0)
+  status       ImportStatus @default(UPLOADED)
+  uploadedById String
+  createdAt    DateTime     @default(now())
+  confirmedAt  DateTime?
+
+  entity     Entity?           @relation(fields: [entityId], references: [id])
+  uploadedBy User              @relation("BudgetImportUploader", fields: [uploadedById], references: [id])
+  rows       BudgetImportRow[]
+
+  @@map("budget_imports")
+}
+
+model BudgetImportRow {
+  id          String          @id @default(cuid())
+  importId    String
+  rowNumber   Int
+  rawData     String          @db.Text
+  status      ImportRowStatus @default(PENDING)
+  errors      String?         @db.Text
+  createdBudgetId String?
+
+  import BudgetImport @relation(fields: [importId], references: [id], onDelete: Cascade)
+
+  @@index([importId, status])
+  @@map("budget_import_rows")
+}
+
+model GLAccountImport {
+  id           String       @id @default(cuid())
+  entityId     String
+  fileName     String
+  totalRows    Int          @default(0)
+  validRows    Int          @default(0)
+  invalidRows  Int          @default(0)
+  importedRows Int          @default(0)
+  updatedRows  Int          @default(0)
+  skippedRows  Int          @default(0)
+  status       ImportStatus @default(UPLOADED)
+  uploadedById String
+  createdAt    DateTime     @default(now())
+  confirmedAt  DateTime?
+
+  entity     Entity             @relation(fields: [entityId], references: [id])
+  uploadedBy User               @relation("GLAccountImportUploader", fields: [uploadedById], references: [id])
+  rows       GLAccountImportRow[]
+
+  @@map("gl_account_imports")
+}
+
+model GLAccountImportRow {
+  id                String          @id @default(cuid())
+  importId          String
+  rowNumber         Int
+  rawData           String          @db.Text
+  status            ImportRowStatus @default(PENDING)
+  errors            String?         @db.Text
+  createdGLAccountId String?
+
+  import GLAccountImport @relation(fields: [importId], references: [id], onDelete: Cascade)
+
+  @@index([importId, status])
+  @@map("gl_account_import_rows")
+}
+
+model AssetClassification {
+  id                String   @id @default(cuid())
+  name              String   @unique
+  code              String   @unique
+  description       String?
+  glAccountCode     String?
+  usefulLifeDefault Int      @default(4)
+  isActive          Boolean  @default(true)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  assets Asset[]
+
+  @@map("asset_classifications")
+}
+
+model Asset {
+  id                   String              @id @default(cuid())
+  assetNo              String              @unique
+  barcodeTag           String?             @unique
+  serialNo             String?             @unique
+  name                 String
+  description          String?             @db.Text
+  classificationId     String?
+  legacyCategory       String?
+  make                 String?
+  model                String?
+  entityId             String
+  branchId             String
+  location             String?
+  isMovable            Boolean             @default(true)
+  acquisitionValue     Decimal?            @db.Decimal(18, 2)
+  unitCost             Decimal?            @db.Decimal(18, 2)
+  quantity             Int                 @default(1)
+  residualValue        Decimal?            @db.Decimal(18, 2)
+  currentBookValue     Decimal?            @db.Decimal(18, 2)
+  purchaseDate         DateTime?
+  usefulLifeYrs        Int                 @default(4)
+  depreciationMethod   DepreciationMethod  @default(STRAIGHT_LINE)
+  lastDepreciationDate DateTime?
+  parentAssetId        String?
+  splitId              String?
+  condition            AssetCondition      @default(GOOD)
+  status               AssetStatus         @default(ACTIVE)
+  approvalStatus       AssetApprovalStatus @default(PENDING_APPROVAL)
+  pendingChanges          Json?
+  pendingChangeInstanceId String?             @unique
+  supplier             String?
+  invoiceRef           String?
+  warrantyExpiry       DateTime?
+  insuranceExpiry      DateTime?
+  glAccountCode        String?
+  budgetRef            String?
+  photos               String?             @db.Text
+  tags                 String?
+  assignedToId         String?
+  createdById          String
+  createdAt            DateTime            @default(now())
+  updatedAt            DateTime            @updatedAt
+
+  invoices Invoice[]
+
+  glTransactions GLTransaction[]
+
+  entity          Entity               @relation(fields: [entityId], references: [id])
+  branch          Branch               @relation(fields: [branchId], references: [id])
+  classification  AssetClassification? @relation(fields: [classificationId], references: [id])
+  assignedTo      User?                @relation("AssetAssignee", fields: [assignedToId], references: [id])
+  createdBy       User                 @relation("AssetCreator", fields: [createdById], references: [id])
+  maintenanceLogs AssetMaintenance[]
+  depreciations   AssetDepreciation[]
+  movements       AssetMovement[]
+  disposals       AssetDisposal[]
+  documents       AssetDocument[]
+
+  parentAsset   Asset?       @relation("AssetSplitLineage", fields: [parentAssetId], references: [id])
+  splitChildren Asset[]      @relation("AssetSplitLineage")
+  splitEvent    AssetSplit?  @relation("AssetSplitChildren", fields: [splitId], references: [id])
+  splitsOfThis  AssetSplit[] @relation("AssetSplitParent")
+
+  @@index([entityId, branchId, status])
+  @@index([classificationId])
+  @@index([approvalStatus])
+  @@index([parentAssetId])
+  @@index([splitId])
+  @@map("assets")
+}
+
+model AssetSplit {
+  id               String                      @id @default(cuid())
+  parentAssetId    String
+  quantitySplit    Int
+  reason           String                      @db.Text
+  effectiveDate    DateTime
+  status           AssetMovementRequestStatus  @default(DRAFT)
+  requestedById    String
+  approvalInstanceId String?                   @unique
+  submittedAt      DateTime?
+  completedAt      DateTime?
+  quantityBefore        Int
+  quantityAfter         Int
+  totalCostBefore       Decimal @db.Decimal(18, 2)
+  totalCostAfter        Decimal @db.Decimal(18, 2)
+  bookValueBefore        Decimal @db.Decimal(18, 2)
+  accumulatedDeprBefore  Decimal @db.Decimal(18, 2)
+  childSpecs       Json
+  attachmentUrl    String?
+  createdAt        DateTime @default(now())
+
+  parentAsset Asset   @relation("AssetSplitParent", fields: [parentAssetId], references: [id])
+  requestedBy User    @relation("AssetSplitRequestedBy", fields: [requestedById], references: [id])
+  children    Asset[] @relation("AssetSplitChildren")
+
+  @@index([parentAssetId])
+  @@index([status])
+  @@map("asset_splits")
+}
+
+model AssetDepreciation {
+  id              String   @id @default(cuid())
+  assetId         String
+  year            Int
+  month           Int
+  openingValue    Decimal  @db.Decimal(18, 2)
+  depreciationAmt Decimal  @db.Decimal(18, 2)
+  closingValue    Decimal  @db.Decimal(18, 2)
+  rate            Decimal  @db.Decimal(5, 4)
+  appliedAt       DateTime @default(now())
+
+  asset Asset @relation(fields: [assetId], references: [id], onDelete: Cascade)
+
+  @@unique([assetId, year, month])
+  @@map("asset_depreciations")
+}
+
+model AssetMaintenance {
+  id            String          @id @default(cuid())
+  assetId       String
+  type          MaintenanceType
+  description   String?         @db.Text
+  cost          Decimal?        @db.Decimal(18, 2)
+  glAccountCode String?
+  vendor        String?
+  performedAt   DateTime
+  nextDueAt     DateTime?
+  status        String          @default("Completed")
+  createdAt     DateTime        @default(now())
+
+  invoiceId String?
+  invoice   Invoice? @relation(fields: [invoiceId], references: [id])
+
+  asset Asset @relation(fields: [assetId], references: [id], onDelete: Cascade)
+
+ @@index([invoiceId])
+  @@map("asset_maintenance")
+}
+
+model AssetMovement {
+  id             String       @id @default(cuid())
+  assetId        String
+  movementType   MovementType
+  fromBranchId   String?
+  fromLocation   String?
+  toBranchId     String?
+  toLocation     String?
+  fromAssigneeId String?
+  toAssigneeId   String?
+  reason         String?      @db.Text
+  authorisedById String?
+  movementDate   DateTime
+  returnDate     DateTime?
+  status         String       @default("Completed")
+  createdAt      DateTime     @default(now())
+
+  requestStatus      AssetMovementRequestStatus?
+  fromEntityId       String?
+  toEntityId         String?
+  assetCodeSnapshot  String?
+  assetDescSnapshot  String?
+  requestedById      String?
+  approvalInstanceId String? @unique
+  attachmentUrl      String?
+  attachments        String? @db.Text
+  remarks            String? @db.Text
+  submittedAt        DateTime?
+  completedAt        DateTime?
+
+  asset      Asset   @relation(fields: [assetId], references: [id], onDelete: Cascade)
+  fromEntity Entity? @relation("AssetMovementFromEntity", fields: [fromEntityId], references: [id])
+  toEntity   Entity? @relation("AssetMovementToEntity", fields: [toEntityId], references: [id])
+  requestedBy User?  @relation("AssetMovementRequestedBy", fields: [requestedById], references: [id])
+
+  @@index([requestStatus])
+  @@index([assetId, requestStatus])
+  @@map("asset_movements")
+}
+
+enum AssetMovementRequestStatus {
+  DRAFT
+  PENDING_APPROVAL
+  APPROVED
+  REJECTED
+  CANCELLED
+  COMPLETED
+}
+
+model AssetDisposal {
+  id              String       @id @default(cuid())
+  assetId         String
+  disposalType    DisposalType
+  disposalDate    DateTime
+  salePrice       Decimal?     @db.Decimal(18, 2)
+  bookValueAtDate Decimal?     @db.Decimal(18, 2)
+  gainLoss        Decimal?     @db.Decimal(18, 2)
+  recipient       String?
+  reason          String?      @db.Text
+  authorisedById  String?
+  glEntryRef      String?
+  documents       String?      @db.Text
+  createdAt       DateTime     @default(now())
+
+  requestStatus      AssetMovementRequestStatus @default(DRAFT)
+  requestedById      String?
+  approvalInstanceId String?                    @unique
+  submittedAt        DateTime?
+  completedAt        DateTime?
+
+  asset       Asset @relation(fields: [assetId], references: [id], onDelete: Cascade)
+  requestedBy User? @relation("AssetDisposalRequestedBy", fields: [requestedById], references: [id])
+
+  @@index([requestStatus])
+  @@map("asset_disposals")
+}
+
+model AssetDocument {
+  id           String    @id @default(cuid())
+  assetId      String
+  documentType DocType
+  title        String
+  fileUrl      String
+  storageProvider String?
+  storageKey      String?
+  fileSize     Int?
+  mimeType     String?
+  expiryDate   DateTime?
+  notes        String?
+  uploadedById String?
+  createdAt    DateTime  @default(now())
+
+  asset Asset @relation(fields: [assetId], references: [id], onDelete: Cascade)
+
+  @@index([storageKey])
+  @@map("asset_documents")
+}
+
+model Notification {
+  id                String           @id @default(cuid())
+  userId            String
+  type              NotificationType @default(INFO)
+  title             String
+  message           String           @db.Text
+  isRead            Boolean          @default(false)
+  actionUrl         String?
+  relatedInstanceId String?
+  createdAt         DateTime         @default(now())
+  readAt            DateTime?
+
+  module      String?
+  typeKey     String?
+  actionLabel String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, isRead])
+  @@map("notifications")
+}
+=======
+// ======================== ASSET MANAGEMENT ========================
+
+model Asset {
+  id             String         @id @default(cuid())
+  entityId       String
+  name           String
+  assetNo        String         @unique
+  category       AssetCategory
+  description    String?        @db.Text
+  location       String?
+  purchaseDate   DateTime?
+  purchasePrice  Decimal?       @db.Decimal(18, 2)
+  currentValue   Decimal?       @db.Decimal(18, 2)
+  condition      AssetCondition @default(GOOD)
+  status         AssetStatus    @default(ACTIVE)
+  assignedToId   String?
+  photos         String?        @db.Text
+  glAccountCode  String?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  entity          Entity             @relation(fields: [entityId], references: [id])
+  assignedTo      User?              @relation(fields: [assignedToId], references: [id])
+  maintenanceLogs AssetMaintenance[]
+
+  @@map("assets")
+}
+
+model AssetMaintenance {
+  id            String   @id @default(cuid())
+  assetId       String
+  type          String
+  description   String?  @db.Text
+  cost          Decimal? @db.Decimal(18, 2)
+  glAccountCode String?
+  performedAt   DateTime
+  nextDueAt     DateTime?
+  createdAt     DateTime @default(now())
+
+  asset Asset @relation(fields: [assetId], references: [id])
+
+  @@map("asset_maintenance")
+}
+
+// ======================== FACILITY MANAGEMENT ========================
+>>>>>>> d14ff358a570a0ae2263d9c3d072128e2da8652f
+
+model Facility {
+  id        String   @id @default(cuid())
+  entityId  String
+  name      String
+  type      String
+  address   String?
+  area      Float?
+  status    String   @default("Active")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  entity     Entity      @relation(fields: [entityId], references: [id])
+  workOrders WorkOrder[]
+
+  @@map("facilities")
+}
+
+model WorkOrder {
+  id            String            @id @default(cuid())
+  facilityId    String
+  title         String
+  description   String?           @db.Text
+  priority      WorkOrderPriority @default(MEDIUM)
+  status        WorkOrderStatus   @default(OPEN)
+  glAccountCode String?
+  estimatedCost Decimal?          @db.Decimal(18, 2)
+  actualCost    Decimal?          @db.Decimal(18, 2)
+  dueAt         DateTime?
+  closedAt      DateTime?
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+
+  facility Facility @relation(fields: [facilityId], references: [id])
+
+  @@map("work_orders")
+}
+
+<<<<<<< HEAD
+model EntityLocation {
+  id           String  @id @default(cuid())
+  entityId     String
+  name         String  @db.VarChar(100)
+  address      String  @db.VarChar(255)
+  city         String  @db.VarChar(100)
+  isHeadOffice Boolean @default(false)
+
+  entity   Entity    @relation(fields: [entityId], references: [id], onDelete: Cascade)
+  vehicles Vehicle[]
+
+  @@map("entity_locations")
+}
+
+model Vehicle {
+  id                  String    @id @default(cuid())
+  plateNumber         String    @unique @db.VarChar(20)
+  make                String    @db.VarChar(100)
+  model               String    @db.VarChar(100)
+  year                Int
+  category            String    @db.VarChar(20)
+  vehicleUse          String    @default("pool") @db.VarChar(10)
+  status              String    @default("idle") @db.VarChar(20)
+  colour              String?   @db.VarChar(50)
+  chassisNumber       String    @unique @db.VarChar(50)
+  engineNumber        String?   @db.VarChar(50)
+  mileage             Float     @default(0)
+  purchaseDate        DateTime?
+  acquisitionValueNgn Float?
+  usefulLifeYears     Int       @default(5)
+  allocationStatus    String    @default("available") @db.VarChar(30)
+  statusStaffName     String?   @db.VarChar(200)
+  statusStaffDept     String?   @db.VarChar(200)
+  statusStaffRole     String?   @db.VarChar(200)
+  statusStaffId       String?   @db.VarChar(50)
+  statusStaffPhone    String?   @db.VarChar(20)
+  statusStaffEmail    String?   @db.VarChar(255)
+  entityId            String?
+  locationId          String?
+  purchaseVendorId    String?
+
+  assignedDriverId String? @unique
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  entity         Entity?         @relation(fields: [entityId], references: [id])
+  location       EntityLocation? @relation(fields: [locationId], references: [id])
+  purchaseVendor Vendor?         @relation("VehiclePurchaseVendor", fields: [purchaseVendorId], references: [id])
+  assignedDriver Driver?         @relation("VehicleDriver", fields: [assignedDriverId], references: [id])
+
+  images      VehicleImage[]
+  documents   VehicleDocument[]
+  trips       Trip[]
+  fuelLogs    FuelLog[]
+  maintenance MaintenanceRecord[]
+  workOrders  FleetWorkOrder[]
+  reminders   Reminder[]
+
+  odometerLogs VehicleOdometerLog[]
+
+  fuelEntitlement VehicleFuelEntitlement?
+  fuelInvoices    Invoice[]
+  fuelLineItems   InvoiceLineItem[]       @relation("InvoiceLineItemVehicle")
+=======
+// ======================== FLEET MANAGEMENT ========================
+
+model Vehicle {
+  id             String        @id @default(cuid())
+  entityId       String
+  plateNo        String        @unique
+  make           String
+  model          String
+  year           Int
+  color          String?
+  status         VehicleStatus @default(AVAILABLE)
+  assignedToId   String?
+  currentMileage Float?
+  fuelType       String?
+  glAccountFuel  String?
+  glAccountRM    String?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  entity    Entity     @relation(fields: [entityId], references: [id])
+  fleetLogs FleetLog[]
+>>>>>>> d14ff358a570a0ae2263d9c3d072128e2da8652f
+
+  @@map("vehicles")
+}
+
+<<<<<<< HEAD
+model VehicleFuelEntitlement {
+  id           String   @id @default(cuid())
+  vehicleId    String   @unique
+  type         String   @db.VarChar(10)
+  amount       Float
+  durationDays Int
+  updatedById  String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  vehicle Vehicle @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+
+  @@map("vehicle_fuel_entitlements")
+}
+
+model VehicleImage {
+  id         String   @id @default(cuid())
+  vehicleId  String
+  url        String   @db.VarChar(500)
+  publicId   String?  @db.VarChar(200)
+  storageProvider String? @db.VarChar(20)
+  storageKey      String? @db.VarChar(500)
+  isPrimary  Boolean  @default(false)
+  uploadedAt DateTime @default(now())
+
+  vehicle Vehicle @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+
+  @@index([storageKey])
+  @@map("vehicle_images")
+}
+
+model VehicleDocument {
+  id             String  @id @default(cuid())
+  vehicleId      String
+  name           String  @db.VarChar(255)
+  type           String  @db.VarChar(50)
+  documentTypeId String?
+  url          String?   @db.VarChar(500)
+  publicId     String?   @db.VarChar(200)
+  storageProvider String? @db.VarChar(20)
+  storageKey      String? @db.VarChar(500)
+  fileSize     Int?
+  mimeType     String?   @db.VarChar(100)
+  expiryDate   DateTime?
+  uploadedById String
+  uploadedAt   DateTime  @default(now())
+
+  vehicle      Vehicle              @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  uploadedBy   User                 @relation("VehicleDocumentUploader", fields: [uploadedById], references: [id])
+  documentType VehicleDocumentType? @relation(fields: [documentTypeId], references: [id])
+  notificationLogs FleetDocumentNotificationLog[]
+
+  @@index([storageKey])
+  @@index([documentTypeId])
+  @@map("vehicle_documents")
+}
+
+model VehicleDocumentType {
+  id          String   @id @default(cuid())
+  name        String   @unique @db.VarChar(100)
+  description String?  @db.VarChar(500)
+  isActive    Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  documents VehicleDocument[]
+
+  @@map("vehicle_document_types")
+}
+
+model FleetNotificationSettings {
+  id String @id
+
+  enableExpiryNotifications Boolean @default(false)
+  reminderDaysBeforeExpiry  Json
+
+  notifyAssignedUser      Boolean @default(true)
+  notifyDefaultRecipients Boolean @default(true)
+  defaultRecipients       Json
+
+  enableCriticalNotifications Boolean @default(false)
+  criticalIntervalDays Int @default(3)
+
+  updatedAt   DateTime @updatedAt
+  updatedById String?
+
+  @@map("fleet_notification_settings")
+}
+
+model FleetDocumentNotificationLog {
+  id                String   @id @default(cuid())
+  vehicleDocumentId String
+  notificationType  String   @db.VarChar(20)
+  thresholdDays Int
+  expiryDate    DateTime
+  recipients    Json
+  status        String   @default("sent") @db.VarChar(20)
+  error         String?  @db.Text
+  sentAt        DateTime @default(now())
+
+  vehicleDocument VehicleDocument @relation(fields: [vehicleDocumentId], references: [id], onDelete: Cascade)
+
+  @@index([vehicleDocumentId, notificationType, expiryDate], map: "fdnl_doc_type_expiry_idx")
+  @@map("fleet_document_notification_logs")
+}
+
+model Driver {
+  id            String  @id @default(cuid())
+  userId        String  @unique
+  photoUrl      String? @db.VarChar(500)
+  photoPublicId String? @db.VarChar(200)
+  photoStorageProvider String? @db.VarChar(20)
+  photoStorageKey      String? @db.VarChar(500)
+  supervisorId  String?
+  status        String  @default("active") @db.VarChar(20)
+  entityId      String?
+
+  assignedVehicleId String? @db.VarChar(30)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user            User     @relation(fields: [userId], references: [id])
+  entity          Entity?  @relation(fields: [entityId], references: [id])
+  assignedVehicle Vehicle? @relation("VehicleDriver")
+
+  licenses   DriverLicense[]
+  trips      Trip[]
+  fuelLogs   FuelLog[]
+  appraisals DriverAppraisal[]
+
+  @@map("drivers")
+}
+
+model DriverLicense {
+  id               String    @id @default(cuid())
+  driverId         String
+  type             String    @db.VarChar(50)
+  licenseNumber    String    @db.VarChar(100)
+  issuingAuthority String    @db.VarChar(200)
+  issueDate        DateTime?
+  expiryDate       DateTime
+  isPrimary        Boolean   @default(false)
+
+  driver Driver @relation(fields: [driverId], references: [id], onDelete: Cascade)
+
+  @@map("driver_licenses")
+}
+
+model Trip {
+  id             String    @id @default(cuid())
+  vehicleId      String
+  driverId       String
+  startLocation  String    @db.VarChar(255)
+  endLocation    String    @db.VarChar(255)
+  startTime      DateTime
+  endTime        DateTime?
+  startOdometer  Float
+  endOdometer    Float?
+  distanceKm     Float?
+  passengerCount Int       @default(0)
+  passengerNames String?   @db.VarChar(500)
+  purpose        String?   @db.VarChar(255)
+  status         String    @default("ongoing") @db.VarChar(20)
+  isLocked       Boolean   @default(false)
+  createdById    String
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  vehicle Vehicle @relation(fields: [vehicleId], references: [id])
+  driver  Driver  @relation(fields: [driverId], references: [id])
+
+  @@map("trips")
+}
+
+model FuelLog {
+  id           String   @id @default(cuid())
+  vehicleId    String
+  driverId     String
+  entityId     String?
+  date         DateTime
+  litres       Float
+  costPerLitre Float
+  totalCost    Float
+  odometerKm   Float
+  station      String?  @db.VarChar(200)
+  createdAt    DateTime @default(now())
+
+  invoiceId String?  @unique
+  invoice   Invoice? @relation(fields: [invoiceId], references: [id], onDelete: SetNull)
+
+  invoiceLineItemId String?          @unique
+  invoiceLineItem   InvoiceLineItem? @relation(fields: [invoiceLineItemId], references: [id], onDelete: SetNull)
+
+  vehicle Vehicle @relation(fields: [vehicleId], references: [id])
+  driver  Driver  @relation(fields: [driverId], references: [id])
+
+  @@map("fuel_logs")
+}
+
+model MaintenanceRecord {
+  id          String    @id @default(cuid())
+  vehicleId   String
+  vendorId    String?
+  type        String    @db.VarChar(100)
+  description String?   @db.Text
+  date        DateTime
+  costNgn     Float
+  nextDueDate DateTime?
+  nextDueKm   Float?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  vehicle Vehicle @relation(fields: [vehicleId], references: [id])
+  vendor  Vendor? @relation(fields: [vendorId], references: [id])
+
+  @@map("maintenance_records")
+}
+
+model VendorContact {
+  id          String  @id @default(cuid())
+  vendorId    String
+  name        String  @db.VarChar(200)
+  phone       String  @db.VarChar(20)
+  email       String? @db.VarChar(255)
+  designation String? @db.VarChar(100)
+
+  vendor Vendor @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+
+  @@map("vendor_contacts")
+}
+
+model Reminder {
+  id               String    @id @default(cuid())
+  vehicleId        String
+  type             String    @db.VarChar(30)
+  documentType     String?   @db.VarChar(50)
+  title            String    @db.VarChar(255)
+  dueDate          DateTime
+  dueMileageKm     Float?
+  notifyDaysBefore Int       @default(14)
+  status           String    @default("pending") @db.VarChar(20)
+  notes            String?   @db.Text
+  createdById      String
+  acknowledgedById String?
+  acknowledgedAt   DateTime?
+  completedAt      DateTime?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  vehicle        Vehicle @relation(fields: [vehicleId], references: [id])
+  createdBy      User    @relation("ReminderCreator", fields: [createdById], references: [id])
+  acknowledgedBy User?   @relation("ReminderAcknowledger", fields: [acknowledgedById], references: [id])
+
+  @@map("reminders")
+}
+
+model FleetWorkOrder {
+  id               String    @id @default(cuid())
+  workOrderNumber  String    @unique @db.VarChar(30)
+  vehicleId        String
+  vendorId         String
+  type             String    @db.VarChar(30)
+  totalCostNgn     Float
+  vatRate          Float     @default(7.5)
+  vatAmountNgn     Float     @default(0)
+  totalPlusVat     Float     @default(0)
+  whtRate          Float     @default(2.0)
+  whtAmountNgn     Float     @default(0)
+  amountPayableNgn Float     @default(0)
+  description      String?   @db.Text
+  priority         String    @default("medium") @db.VarChar(20)
+  status           String    @default("draft") @db.VarChar(30)
+  createdById      String
+  createdByName    String    @db.VarChar(200)
+  approverId       String
+  approverName     String    @db.VarChar(200)
+  approverLimitNgn Float
+  approvedAt       DateTime?
+  approvalNote     String?   @db.Text
+  recalledAt       DateTime?
+  recallReason     String?   @db.Text
+  rejectedAt       DateTime?
+  rejectionReason  String?   @db.Text
+  actualCostNgn    Float?
+  completedAt      DateTime?
+  invoiceUrl       String?   @db.VarChar(500)
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  vehicle   Vehicle @relation(fields: [vehicleId], references: [id])
+  vendor    Vendor  @relation(fields: [vendorId], references: [id])
+  createdBy User    @relation("WOCreatedBy", fields: [createdById], references: [id])
+  approver  User    @relation("WOApprover", fields: [approverId], references: [id])
+
+  items       WorkOrderItem[]
+  attachments WorkOrderAttachment[]
+  financials  WorkOrderFinancials?
+
+  @@map("fleet_work_orders")
+}
+
+model WorkOrderItem {
+  id           String @id @default(cuid())
+  workOrderId  String
+  description  String @db.VarChar(500)
+  quantity     Float
+  unitCostNgn  Float
+  totalCostNgn Float
+
+  workOrder FleetWorkOrder @relation(fields: [workOrderId], references: [id], onDelete: Cascade)
+
+  @@map("work_order_items")
+}
+
+model WorkOrderFinancials {
+  id               String   @id @default(cuid())
+  workOrderId      String   @unique
+  subtotalNgn      Float
+  vatRate          Float    @default(7.5)
+  vatAmountNgn     Float
+  totalWithVatNgn  Float
+  whtRate          Float    @default(2.0)
+  whtAmountNgn     Float
+  amountPayableNgn Float
+  updatedAt        DateTime @updatedAt
+
+  workOrder FleetWorkOrder @relation(fields: [workOrderId], references: [id], onDelete: Cascade)
+
+  @@map("work_order_financials")
+}
+
+model WorkOrderAttachment {
+  id             String   @id @default(cuid())
+  workOrderId    String
+  fileName       String   @db.VarChar(255)
+  fileSize       Int
+  fileType       String   @db.VarChar(100)
+  url            String   @db.VarChar(500)
+  publicId       String?  @db.VarChar(200)
+  storageProvider String? @db.VarChar(20)
+  storageKey      String? @db.VarChar(500)
+  description    String?  @db.VarChar(255)
+  uploadedById   String
+  uploadedByName String   @db.VarChar(200)
+  uploadedAt     DateTime @default(now())
+
+  workOrder  FleetWorkOrder @relation(fields: [workOrderId], references: [id], onDelete: Cascade)
+  uploadedBy User           @relation(fields: [uploadedById], references: [id])
+
+  @@index([storageKey])
+  @@map("work_order_attachments")
+}
+
+model DriverAppraisal {
+  id                 String    @id @default(cuid())
+  driverId           String
+  driverName         String    @db.VarChar(200)
+  supervisorId       String
+  supervisorName     String    @db.VarChar(200)
+  entityId           String    @db.VarChar(50)
+  period             String    @db.VarChar(50)
+  periodMonth        Int
+  periodYear         Int
+  status             String    @default("draft") @db.VarChar(20)
+  scoresJson         String    @db.LongText
+  overallScore       Float     @default(0)
+  grade              String    @default("C") @db.VarChar(2)
+  supervisorComments String?   @db.Text
+  driverComments     String?   @db.Text
+  hrReviewedAt       DateTime?
+  hrReviewerId       String?
+  hrReviewerName     String?   @db.VarChar(200)
+  hrNotes            String?   @db.Text
+  submittedAt        DateTime?
+  acknowledgedAt     DateTime?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  driver     Driver @relation(fields: [driverId], references: [id])
+  supervisor User   @relation("AppraisalSupervisor", fields: [supervisorId], references: [id])
+  hrReviewer User?  @relation("AppraisalHRReviewer", fields: [hrReviewerId], references: [id])
+
+  @@unique([driverId, periodMonth, periodYear])
+  @@map("driver_appraisals")
+}
+
+model NotificationPreference {
+  id      String  @id @default(cuid())
+  userId  String
+  type    String  @db.VarChar(100)
+  enabled Boolean @default(true)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, type])
+  @@map("notification_preferences")
+}
+
+model UserSession {
+  id           String    @id @default(cuid())
+  userId       String
+  loginAt      DateTime  @default(now())
+  logoutAt     DateTime?
+  ipAddress    String?   @db.VarChar(50)
+  userAgent    String?   @db.VarChar(1000)
+  browser      String?   @db.VarChar(100)
+  os           String?   @db.VarChar(100)
+  device       String?   @db.VarChar(50)
+  location     String?   @db.VarChar(200)
+  sessionToken String?   @db.VarChar(200)
+  isActive     Boolean   @default(true)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([loginAt])
+  @@map("user_sessions")
+}
+
+model Subscription {
+  id String @id @default(cuid())
+
+  code String @unique @db.VarChar(700)
+
+  label       String?   @db.VarChar(200)
+  startDate   DateTime
+  endDate     DateTime
+  isActive    Boolean   @default(false)
+  activatedAt DateTime?
+  activatedBy String?   @db.VarChar(200)
+  isRevoked   Boolean   @default(false)
+  revokedAt   DateTime?
+  notes       String?   @db.Text
+  createdById String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  creator User @relation("SubscriptionCreator", fields: [createdById], references: [id])
+
+  @@index([isActive])
+  @@index([endDate])
+  @@map("subscriptions")
+}
+
+model Announcement {
+  id            String   @id @default(cuid())
+  headline      String   @db.VarChar(255)
+  body          String   @db.Text
+  imageUrl      String?  @db.VarChar(500)
+  imagePublicId String?  @db.VarChar(200)
+  showFrom      DateTime
+  showUntil     DateTime
+  priority      Int      @default(0)
+  isActive      Boolean  @default(true)
+  targetRoles   String   @default("all") @db.VarChar(200)
+  createdById   String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  createdBy  User                    @relation("AnnouncementCreator", fields: [createdById], references: [id])
+  dismissals AnnouncementDismissal[]
+
+  @@index([showFrom, showUntil, isActive])
+  @@map("announcements")
+}
+
+model AnnouncementDismissal {
+  id             String   @id @default(cuid())
+  announcementId String
+  userId         String
+  dismissedAt    DateTime @default(now())
+
+  announcement Announcement @relation(fields: [announcementId], references: [id], onDelete: Cascade)
+
+  @@unique([announcementId, userId])
+  @@map("announcement_dismissals")
+}
+
+model VehicleOdometerLog {
+  id           String   @id @default(cuid())
+  vehicleId    String
+  readingKm    Float
+  source       String   @db.VarChar(20)
+  sourceId     String?  @db.VarChar(50)
+  recordedAt   DateTime @default(now())
+  recordedById String
+
+  vehicle Vehicle @relation(fields: [vehicleId], references: [id])
+
+  @@index([vehicleId, readingKm])
+  @@index([vehicleId, recordedAt])
+  @@map("vehicle_odometer_logs")
+}
+
+model Invoice {
+  id                       String              @id @default(cuid())
+  entityId                 String
+  branchId                 String?
+  budgetEntityId           String?
+  invoiceNo                String              @unique
+  invoiceType              InvoiceCategoryType @default(GENERAL_EXPENSE)
+  vendorId                 String?
+  vendorName               String
+  vendorEmail              String?
+  vendorIsOneTime           Boolean             @default(false)
+  oneTimeVendorPhone        String?
+  oneTimeVendorBankName     String?
+  oneTimeVendorBankAccountNo   String?
+  oneTimeVendorBankAccountName String?
+  oneTimeVendorReason       String?             @db.Text
+  subtotal                 Decimal             @default(0) @db.Decimal(18, 2)
+  vatRate                  Decimal             @default(0.075) @db.Decimal(5, 4)
+  vatAmount                Decimal             @default(0) @db.Decimal(18, 2)
+  whtRate                  Decimal             @default(0.02) @db.Decimal(5, 4)
+  whtAmount                Decimal             @default(0) @db.Decimal(18, 2)
+  totalAmount              Decimal             @default(0) @db.Decimal(18, 2)
+  amountPayable            Decimal             @default(0) @db.Decimal(18, 2)
+  glAccountCode            String
+  glAccountId              String?
+  glAccount                GLAccount?          @relation(fields: [glAccountId], references: [id])
+  isBudgetExceeded         Boolean             @default(false)
+  exceedanceAmount         Decimal?            @db.Decimal(18, 2)
+  isExceptionalApproval    Boolean             @default(false)
+  exceptionalJustification String?             @db.Text
+  budgetYear               Int?
+  budgetMonth               Int?
+  annualBudgetAmount        Decimal? @db.Decimal(18, 2)
+  monthlyBudgetAmount       Decimal? @db.Decimal(18, 2)
+  monthlyExpensedAmount     Decimal? @db.Decimal(18, 2)
+  monthlyAvailableAmount    Decimal? @db.Decimal(18, 2)
+  status                   InvoiceStatus       @default(DRAFT)
+  approvalStatus           String?
+  approvalInstanceId String? @unique
+  dueDate                  DateTime?
+  paidAt                   DateTime?
+  paymentRef               String?
+  recalledAt               DateTime?
+  recallReason             String?
+  description              String?             @db.Text
+  attachments              String?             @db.Text
+  submittedById            String
+  approvedById             String?
+  createdAt                DateTime            @default(now())
+  updatedAt                DateTime            @updatedAt
+
+  assetId String?
+  asset   Asset?  @relation(fields: [assetId], references: [id])
+
+  vehicleId  String?
+  vehicle    Vehicle? @relation(fields: [vehicleId], references: [id], onDelete: SetNull)
+  fuelLitres Decimal? @db.Decimal(10, 2)
+  fuelType   String?  @db.VarChar(10)
+  fuelLog    FuelLog?
+
+  maintenanceLogs AssetMaintenance[]
+
+  entity       Entity            @relation("InvoiceEntity", fields: [entityId], references: [id])
+  budgetEntity Entity?           @relation("InvoiceBudgetEntity", fields: [budgetEntityId], references: [id])
+  vendor       Vendor?           @relation("VendorInvoices", fields: [vendorId], references: [id])
+  submittedBy  User              @relation("InvoiceSubmitter", fields: [submittedById], references: [id])
+  approvedBy   User?             @relation("InvoiceApprover", fields: [approvedById], references: [id])
+  lineItems    InvoiceLineItem[]
+  approvalSelections InvoiceApprovalSelection[]
+
+  paymentBatches PaymentBatch[]
+
+  paymentEscalations    PaymentEscalation[]
+  paymentJournalEntries PaymentJournalEntry[]
+  vendorLedgerEntries   VendorLedger[]
+  paymentReminders      PaymentReminder[]
+
+  actualLine ActualLine?
+
+  glTransaction GLTransaction?
+
+  @@index([entityId, status])
+  @@index([vendorId])
+  @@index([assetId])
+  @@map("invoices")
+}
+
+model Vendor {
+  id               String   @id @default(cuid())
+  entityId         String?
+  name             String
+  code             String?  @unique
+  email            String?
+  phone            String?
+  address          String?  @db.Text
+  website          String?
+  taxId            String?
+  rcNumber         String?
+  contactPerson    String?
+  contactEmail     String?
+  contactPhone     String?
+  bankName         String?
+  bankAccountNo    String?
+  bankAccountName  String?
+  bankSortCode     String?
+  isActive         Boolean  @default(true)
+  isApproved       Boolean  @default(false)
+  notes            String?  @db.Text
+  createdById      String
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  contractFileName String?
+  contractFileUrl  String?
+
+  city            String?
+  state           String?
+  country         String? @default("Nigeria")
+  classifications String? @db.Text
+
+  entity    Entity?   @relation(fields: [entityId], references: [id])
+  createdBy User      @relation("VendorCreator", fields: [createdById], references: [id])
+  invoices  Invoice[] @relation("VendorInvoices")
+
+  vendorLedgerEntries VendorLedger[]
+  paymentReminders    PaymentReminder[]
+
+  contacts           VendorContact[]
+  fleetWorkOrders    FleetWorkOrder[]
+  maintenanceRecords MaintenanceRecord[]
+  purchasedVehicles  Vehicle[]           @relation("VehiclePurchaseVendor")
+
+  @@index([entityId, isActive])
+  @@map("vendors")
+}
+
+model InvoiceLineItem {
+  id          String   @id @default(cuid())
+  invoiceId   String
+  description String
+  quantity    Decimal  @db.Decimal(10, 2)
+  unitCost    Decimal  @db.Decimal(18, 2)
+  totalCost   Decimal  @db.Decimal(18, 2)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+
+  vehicleId String?
+  vehicle   Vehicle? @relation("InvoiceLineItemVehicle", fields: [vehicleId], references: [id])
+
+  invoice Invoice  @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  fuelLog FuelLog?
+
+  @@index([invoiceId])
+  @@index([vehicleId])
+  @@map("invoice_line_items")
+}
+
+model AuditLog {
+  id           String   @id @default(cuid())
+  userId       String?
+  action       String
+  module       String
+  entityId     String?
+  resourceId   String?
+  resourceType String?
+  beforeData   String?  @db.Text
+  afterData    String?  @db.Text
+  meta         String?  @db.Text
+  ipAddress    String?
+  userAgent    String?  @db.Text
+  location     String?
+  createdAt    DateTime @default(now())
+
+  userEmail String?
+  userName  String?
+  userRole  String?
+  status    String? @default("success")
+  browser   String?
+  os        String?
+  device    String?
+  sessionId String?
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([module])
+  @@index([createdAt])
+  @@map("audit_logs")
+}
+
+model PaymentBatch {
+  id String @id @default(cuid())
+
+  invoiceId String
+  invoice   Invoice @relation(fields: [invoiceId], references: [id])
+
+  entityId String
+  entity   Entity @relation(fields: [entityId], references: [id])
+
+  assignedById       String
+  assignedBy         User   @relation("PaymentAssignedBy", fields: [assignedById], references: [id])
+  assignedByRoleName String @default("")
+
+  tellerId String
+  teller   User   @relation("PaymentTeller", fields: [tellerId], references: [id])
+
+  instructions   String? @db.Text
+  isSplitPayment Boolean @default(false)
+
+  totalAmount     Decimal @db.Decimal(18, 2)
+  amountDisbursed Decimal @default(0) @db.Decimal(18, 2)
+
+  status       PaymentBatchStatus @default(ASSIGNED)
+  assignedAt   DateTime           @default(now())
+  completedAt  DateTime?
+  cancelledAt  DateTime?
+  cancelReason String?            @db.Text
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  tranches PaymentTranche[]
+
+  escalations    PaymentEscalation[]
+  journalEntries PaymentJournalEntry[]
+
+  @@index([invoiceId])
+  @@index([tellerId, status])
+  @@index([assignedById])
+  @@index([entityId, status])
+  @@map("payment_batches")
+}
+
+enum PaymentBatchStatus {
+  ASSIGNED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+  QUEUED
+}
+
+model PaymentTranche {
+  id             String       @id @default(cuid())
+  paymentBatchId String
+  paymentBatch   PaymentBatch @relation(fields: [paymentBatchId], references: [id], onDelete: Cascade)
+
+  trancheNumber     Int
+  label             String?
+  plannedPercentage Decimal? @db.Decimal(5, 2)
+  plannedAmount     Decimal  @db.Decimal(18, 2)
+
+  paymentMethod     PaymentMethod?
+  bankName          String?
+  bankAccountNo     String?
+  bankAccountName   String?
+  transactionRef    String?
+  proofOfPaymentUrl String?
+  tellerNotes       String?        @db.Text
+  processedById     String?
+  processedBy       User?          @relation("PaymentProcessedBy", fields: [processedById], references: [id])
+  processedAt       DateTime?
+
+  status          PaymentTrancheStatus @default(PENDING)
+  submittedAt     DateTime?
+  approvedAmount  Decimal?             @db.Decimal(18, 2)
+  paidAt          DateTime?
+  rejectedAt      DateTime?
+  rejectionReason String?              @db.Text
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  approvals PaymentApproval[]
+
+  proofs PaymentProof[]
+
+  @@unique([paymentBatchId, trancheNumber])
+  @@index([status])
+  @@index([processedById])
+  @@map("payment_tranches")
+}
+
+model PaymentProof {
+  id               String @id @default(cuid())
+  paymentTrancheId String
+
+  fileName String
+  fileType String
+  fileUrl  String
+  fileSize Int
+  storageProvider String?
+  storageKey      String?
+
+  uploadedById   String
+  uploadedByRole String?
+  uploadedAt     DateTime @default(now())
+
+  paymentTranche PaymentTranche @relation(fields: [paymentTrancheId], references: [id], onDelete: Cascade)
+  uploadedBy     User           @relation("ProofUploadedBy", fields: [uploadedById], references: [id])
+
+  @@index([paymentTrancheId])
+  @@index([storageKey])
+  @@map("payment_proofs")
+}
+
+model PaymentEscalation {
+  id             String  @id @default(cuid())
+  invoiceId      String
+  paymentBatchId String?
+
+  escalatedById   String
+  escalatedByRole String  @default("")
+  reason          String  @db.Text
+  comment         String? @db.Text
+
+  status PaymentEscalationStatus @default(OPEN)
+
+  resolvedById   String?
+  resolvedByRole String?
+  resolvedAt     DateTime?
+  resolvedNote   String?   @db.Text
+
+  submitterNotifiedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  invoice      Invoice       @relation(fields: [invoiceId], references: [id])
+  paymentBatch PaymentBatch? @relation(fields: [paymentBatchId], references: [id])
+  escalatedBy  User          @relation("EscalationRaisedBy", fields: [escalatedById], references: [id])
+  resolvedBy   User?         @relation("EscalationResolvedBy", fields: [resolvedById], references: [id])
+
+  @@index([invoiceId])
+  @@index([status])
+  @@map("payment_escalations")
+}
+
+model PaymentJournalEntry {
+  id               String @id @default(cuid())
+  entityId         String
+  paymentBatchId   String
+  paymentTrancheId String @unique
+  invoiceId        String
+
+  entryRef  String   @unique
+  entryDate DateTime
+
+  description String
+  invoiceNo   String
+  vendorName  String
+
+  debitGLCode String
+  debitGLName String
+
+  creditGLCode String
+  creditGLName String
+
+  grossAmount Decimal @db.Decimal(18, 2)
+  vatAmount   Decimal @default(0) @db.Decimal(18, 2)
+  whtAmount   Decimal @default(0) @db.Decimal(18, 2)
+  netAmount   Decimal @db.Decimal(18, 2)
+
+  createdById String
+  createdAt   DateTime @default(now())
+
+  entity       Entity       @relation(fields: [entityId], references: [id])
+  paymentBatch PaymentBatch @relation(fields: [paymentBatchId], references: [id])
+  invoice      Invoice      @relation(fields: [invoiceId], references: [id])
+  createdBy    User         @relation("JournalEntryCreatedBy", fields: [createdById], references: [id])
+
+  @@index([entityId, entryDate])
+  @@index([invoiceId])
+  @@index([paymentBatchId])
+  @@map("payment_journal_entries")
+}
+
+model VendorLedger {
+  id               String  @id @default(cuid())
+  vendorId         String
+  entityId         String
+  invoiceId        String?
+  paymentTrancheId String?
+
+  entryType   VendorLedgerType
+  description String
+  reference   String?
+
+  debitAmount    Decimal? @db.Decimal(18, 2)
+  creditAmount   Decimal? @db.Decimal(18, 2)
+  runningBalance Decimal  @db.Decimal(18, 2)
+
+  entryDate DateTime
+  createdAt DateTime @default(now())
+
+  vendor  Vendor   @relation(fields: [vendorId], references: [id])
+  entity  Entity   @relation(fields: [entityId], references: [id])
+  invoice Invoice? @relation(fields: [invoiceId], references: [id])
+
+  @@index([vendorId, entityId])
+  @@index([entryDate])
+  @@map("vendor_ledgers")
+}
+
+model PaymentReminder {
+  id          String @id @default(cuid())
+  entityId    String
+  createdById String
+
+  vendorId  String?
+  invoiceId String?
+
+  title  String
+  notes  String?  @db.Text
+  amount Decimal? @db.Decimal(18, 2)
+
+  additionalEmails String? @db.Text
+
+  reminderDate DateTime
+  frequency    ReminderFrequency @default(ONCE)
+  isActive     Boolean           @default(true)
+
+  lastSentAt DateTime?
+  nextSendAt DateTime?
+  sentCount  Int       @default(0)
+
+  failureCount      Int       @default(0)
+  lastFailureReason String?   @db.Text
+  lastFailureAt     DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  entity    Entity   @relation(fields: [entityId], references: [id])
+  createdBy User     @relation("ReminderCreatedBy", fields: [createdById], references: [id])
+  vendor    Vendor?  @relation(fields: [vendorId], references: [id])
+  invoice   Invoice? @relation(fields: [invoiceId], references: [id])
+
+  @@index([entityId, isActive])
+  @@index([nextSendAt, isActive])
+  @@map("payment_reminders")
+}
+
+enum PaymentEscalationStatus {
+  OPEN
+  RESOLVED
+  CLOSED
+}
+
+enum VendorLedgerType {
+  INVOICE_RAISED
+  PAYMENT_MADE
+  ADJUSTMENT
+}
+
+enum ReminderFrequency {
+  ONCE
+  WEEKLY
+  MONTHLY
+  QUARTERLY
+}
+
+enum PaymentMethod {
+  BANK_TRANSFER
+  RTGS
+  NEFT
+  CHEQUE
+  CASH
+}
+
+enum PaymentTrancheStatus {
+  PENDING
+  SUBMITTED
+  PAID
+  REJECTED
+}
+
+model PaymentApproval {
+  id               String         @id @default(cuid())
+  paymentTrancheId String
+  paymentTranche   PaymentTranche @relation(fields: [paymentTrancheId], references: [id], onDelete: Cascade)
+
+  approvedById String
+  approvedBy   User   @relation("PaymentApprover", fields: [approvedById], references: [id])
+  roleName     String @default("")
+
+  action  PaymentApprovalAction
+  comment String?
+
+  isDecisive Boolean @default(false)
+
+  createdAt DateTime @default(now())
+
+  @@unique([paymentTrancheId, approvedById])
+  @@index([paymentTrancheId])
+  @@map("payment_approvals")
+}
+
+enum PaymentApprovalAction {
+  APPROVED
+  REJECTED
+}
+
+enum BudgetType {
+  OPEX
+  CAPEX
+}
+=======
+model FleetLog {
+  id            String       @id @default(cuid())
+  vehicleId     String
+  driverId      String
+  type          FleetLogType
+  description   String?
+  mileage       Float?
+  cost          Decimal?     @db.Decimal(18, 2)
+  glAccountCode String?
+  date          DateTime
+  createdAt     DateTime     @default(now())
+
+  vehicle Vehicle @relation(fields: [vehicleId], references: [id])
+  driver  User    @relation(fields: [driverId], references: [id])
+
+  @@map("fleet_logs")
+}
+
+// ======================== INVOICE PROCESSING ========================
+
+model Invoice {
+  id            String        @id @default(cuid())
+  entityId      String
+  invoiceNo     String        @unique
+  vendorName    String
+  vendorEmail   String?
+  description   String?       @db.Text
+  amount        Decimal       @db.Decimal(18, 2)
+  tax           Decimal?      @db.Decimal(18, 2)
+  totalAmount   Decimal       @db.Decimal(18, 2)
+  glAccountCode String?
+  status        InvoiceStatus @default(PENDING)
+  dueDate       DateTime?
+  paidAt        DateTime?
+  attachments   String?       @db.Text
+  submittedById String
+  approvedById  String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  entity      Entity @relation(fields: [entityId], references: [id])
+  submittedBy User   @relation(fields: [submittedById], references: [id])
+
+  @@map("invoices")
+}
+
+// ======================== AUDIT LOGS ========================
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  userId     String
+  action     String
+  module     String
+  entityId   String?
+  resourceId String?
+  meta       String?  @db.Text
+  ipAddress  String?
+  createdAt  DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("audit_logs")
+}
+
+// ======================== ENUMS ========================
+>>>>>>> d14ff358a570a0ae2263d9c3d072128e2da8652f
+
+enum DistributionType {
+  EQUAL
+  WEIGHTED
+  MANUAL
+}
+
+enum BudgetStatus {
+  DRAFT
+  SUBMITTED
+  APPROVED
+  REJECTED
+  ACTIVE
+}
+
+enum ApprovalAction {
+  SUBMITTED
+  APPROVED
+  REJECTED
+  REVISED
+}
+
+<<<<<<< HEAD
+enum ApprovalInstanceStatus {
+  IN_PROGRESS
+  FULLY_APPROVED
+  REJECTED
+  CANCELLED
+}
+
+enum ApprovalStepStatus {
+  WAITING
+  PENDING
+  APPROVED
+  REJECTED
+  SKIPPED
+  CANCELLED
+}
+
+enum AssetApprovalStatus {
+  PENDING_APPROVAL
+  IN_APPROVAL
+  APPROVED
+  REJECTED
+=======
+enum AssetCategory {
+  FURNITURE
+  EQUIPMENT
+  VEHICLE
+  PROPERTY
+  IT
+  OTHER
+>>>>>>> d14ff358a570a0ae2263d9c3d072128e2da8652f
+}
+
+enum AssetCondition {
+  EXCELLENT
+  GOOD
+  FAIR
+  POOR
+<<<<<<< HEAD
+  CONDEMNED
+=======
+>>>>>>> d14ff358a570a0ae2263d9c3d072128e2da8652f
+}
+
+enum AssetStatus {
+  ACTIVE
+  UNDER_MAINTENANCE
+  DISPOSED
+  MISSING
+<<<<<<< HEAD
+  DONATED
+  TRANSFERRED
+  RETIRED
+  SPLIT
+}
+
+enum DepreciationMethod {
+  STRAIGHT_LINE
+  REDUCING_BALANCE
+  NONE
+}
+
+enum MaintenanceType {
+  PREVENTIVE
+  CORRECTIVE
+  INSPECTION
+  CALIBRATION
+  UPGRADE
+}
+
+enum MovementType {
+  REALLOCATION
+  TEMPORARY_LOAN
+  RETURN
+  ASSIGNMENT
+  UNASSIGNMENT
+  REPAIR_TRANSIT
+}
+
+enum DisposalType {
+  SALE
+  SCRAP
+  DONATION
+  WRITE_OFF
+  THEFT_LOSS
+}
+
+enum DocType {
+  PURCHASE_INVOICE
+  WARRANTY
+  MANUAL
+  INSURANCE
+  CONTRACT
+  PHOTO
+  OTHER
+=======
+>>>>>>> d14ff358a570a0ae2263d9c3d072128e2da8652f
+}
+
+enum WorkOrderPriority {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum WorkOrderStatus {
+  OPEN
+<<<<<<< HEAD
+  PENDING_APPROVAL
+  APPROVED
+=======
+>>>>>>> d14ff358a570a0ae2263d9c3d072128e2da8652f
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+<<<<<<< HEAD
+enum InvoiceStatus {
+  DRAFT
+=======
+enum VehicleStatus {
+  AVAILABLE
+  IN_USE
+  MAINTENANCE
+  DECOMMISSIONED
+}
+
+enum FleetLogType {
+  FUEL
+  MAINTENANCE
+  REPAIR
+  TRIP
+  INSPECTION
+}
+
+enum InvoiceStatus {
+>>>>>>> d14ff358a570a0ae2263d9c3d072128e2da8652f
+  PENDING
+  UNDER_REVIEW
+  APPROVED
+  PAID
+  REJECTED
+<<<<<<< HEAD
+  RECALLED
+  OVERDUE
+  EXCEPTIONAL
+  PAYMENT_PROCESSING
+  PARTIALLY_PAID
+  PAYMENT_ESCALATED
+  PAYMENT_QUEUED
+}
+
+enum NotificationType {
+  INFO
+  SUCCESS
+  WARNING
+  ERROR
+  APPROVAL
+  ALERT
+  ASSET_MOVED
+  PAYMENT
+}
+
+enum InvoiceCategoryType {
+  GENERAL_EXPENSE
+  ASSET_RELATED
+  ASSET_PURCHASE
+  FLEET_FUEL
+=======
+  OVERDUE
+>>>>>>> d14ff358a570a0ae2263d9c3d072128e2da8652f
+}

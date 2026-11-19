@@ -1,0 +1,63 @@
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 220 30% 96%;
+    --foreground: 228 50% 12%;
+    --card: 0 0% 100%;
+    --card-foreground: 228 50% 12%;
+    --border: 220 20% 88%;
+    --input: 220 25% 95%;
+    --ring: 44 100% 50%;
+    --muted: 220 20% 94%;
+    --muted-foreground: 220 15% 48%;
+    --accent: 220 25% 94%;
+    --accent-foreground: 228 50% 12%;
+    --secondary: 220 20% 94%;
+    --secondary-foreground: 228 50% 12%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --radius: 0.625rem;
+
+<<<<<<< HEAD
+=======
+    /* Brand */
+>>>>>>> d14ff358a570a0ae2263d9c3d072128e2da8652f
+    --primary: #FFB800;
+    --navy: #1B2A8A;
+    --navy-dark: #121E6B;
+  }
+
+  .dark {
+    --background: 222 30% 9%;
+    --foreground: 220 20% 90%;
+    --card: 222 28% 12%;
+    --card-foreground: 220 20% 90%;
+    --border: 222 25% 20%;
+    --input: 222 28% 15%;
+    --ring: 44 100% 50%;
+    --muted: 222 25% 18%;
+    --muted-foreground: 220 15% 55%;
+    --accent: 222 25% 18%;
+    --accent-foreground: 220 20% 90%;
+    --secondary: 222 25% 18%;
+    --secondary-foreground: 220 20% 90%;
+    --destructive: 0 72% 50%;
+    --destructive-foreground: 0 0% 100%;
+  }
+
+  * { @apply border-border; }
+  body { @apply bg-background text-foreground font-sans antialiased; }
+}
+
+@layer utilities {
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--border)) transparent;
+  }
+  .animate-fade-in { animation: fade-in 0.3s ease-out; }
+}
